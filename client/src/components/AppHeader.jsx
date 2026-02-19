@@ -1,20 +1,14 @@
-import { useNavigate } from "react-router-dom";
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/clerk-react";
 import { useAuth } from "../hooks/useAuth";
 import ThemeToggle from "./ThemeToggle";
 
 export default function AppHeader() {
-  const { isLoaded, isSignedIn, signOut, user } = useAuth();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/", { replace: true });
-  };
-
-  const initials =
-    user?.email?.[0]?.toUpperCase() ||
-    user?.user_metadata?.name?.[0]?.toUpperCase() ||
-    "U";
+  const { isLoaded } = useAuth();
 
   return (
     <header
@@ -44,41 +38,23 @@ export default function AppHeader() {
             />
           ) : (
             <div className="flex items-center gap-2">
-              {isSignedIn ? (
-                <>
-                  <div
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold"
-                    style={{
-                      border: `1px solid var(--border)`,
-                      color: "var(--text)",
-                    }}
-                    title={user?.email || "Account"}
-                  >
-                    {initials}
-                  </div>
+              <SignedIn>
+                <UserButton afterSignOutUrl="/" userProfileMode="modal" />
+              </SignedIn>
+
+              <SignedOut>
+                <SignInButton mode="modal" forceRedirectUrl="/dashboard">
                   <button
-                    onClick={handleSignOut}
-                    className="h-9 rounded-lg px-3 text-sm font-medium transition hover:-translate-y-0.5"
+                    className="h-9 rounded-lg px-4 text-sm font-medium transition hover:-translate-y-0.5"
                     style={{
-                      border: `1px solid var(--border)`,
-                      color: "var(--text)",
+                      backgroundColor: "var(--text)",
+                      color: "var(--bg)",
                     }}
                   >
-                    Sign out
+                    Sign in
                   </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => navigate("/login")}
-                  className="h-9 rounded-lg px-4 text-sm font-medium transition hover:-translate-y-0.5"
-                  style={{
-                    backgroundColor: "var(--text)",
-                    color: "var(--bg)",
-                  }}
-                >
-                  Sign in
-                </button>
-              )}
+                </SignInButton>
+              </SignedOut>
             </div>
           )}
         </div>

@@ -95,25 +95,12 @@ Open [http://localhost:5173](http://localhost:5173)
 - Express 5.2
 - PostgreSQL with UUID keys
 - Clerk Express SDK
-- Node-postgres
+- Node-postgres-supabase
 
-## 🌐 Deployment
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment guide.
-
-**Quick Deploy:**
-
-- Frontend: Vercel (Free)
-- Backend: Railway ($5/month)
-- Database: Railway PostgreSQL (included)
-
-All deployment-ready changes are already made! ✅
 
 ## 📚 Documentation
 
-- [Deployment Guide](DEPLOYMENT.md) - Production deployment instructions
 - [CI/CD Setup](.github/CI_SETUP.md) - GitHub Actions configuration
-- [Features Overview](docs/FEATURES.md) - Detailed feature documentation (coming soon)
 
 ## 🏗️ Project Structure
 
@@ -143,7 +130,6 @@ LinkVault/
 - CORS protection
 - SQL injection prevention (parameterized queries)
 - Foreign key constraints for data integrity
-- SSL required for production database
 
 ## 🧪 Testing
 
@@ -179,9 +165,8 @@ This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
-- [Clerk](https://clerk.com) - Authentication
-- [Railway](https://railway.app) - Hosting
-- [Vercel](https://vercel.com) - Frontend deployment
+- [Clerk](https://dashboard.clerk.com) - Authentication
+- [Supabase](https://supabase.com) - DB Hosted
 
 ---
 

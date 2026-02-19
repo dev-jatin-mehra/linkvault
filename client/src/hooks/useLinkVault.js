@@ -80,7 +80,7 @@ export default function useLinkVault() {
     };
 
     loadCollections();
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn]);
 
   useEffect(() => {
     const loadLinks = async () => {
@@ -104,7 +104,7 @@ export default function useLinkVault() {
     };
 
     loadLinks();
-  }, [selectedId, isLoaded, isSignedIn, getToken]);
+  }, [selectedId, isLoaded, isSignedIn]);
 
   useEffect(() => {
     const loadMembers = async () => {
@@ -127,7 +127,7 @@ export default function useLinkVault() {
     };
 
     loadMembers();
-  }, [selectedId, isLoaded, isSignedIn, getToken]);
+  }, [selectedId, isLoaded, isSignedIn]);
 
   useEffect(() => {
     const loadAnalytics = async () => {
@@ -146,7 +146,7 @@ export default function useLinkVault() {
     };
 
     loadAnalytics();
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn]);
 
   useEffect(() => {
     const runSearch = async () => {
@@ -175,7 +175,7 @@ export default function useLinkVault() {
 
     const timer = setTimeout(runSearch, 180);
     return () => clearTimeout(timer);
-  }, [searchQuery, getToken, isSignedIn]);
+  }, [searchQuery, isSignedIn]);
 
   // Real-time polling for collections updates
   useEffect(() => {
@@ -193,7 +193,7 @@ export default function useLinkVault() {
 
     const interval = setInterval(pollCollections, 2000); // Poll every 2 seconds for immediate updates
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn]);
 
   // Real-time polling for links updates (click counts, new links)
   useEffect(() => {
@@ -211,7 +211,7 @@ export default function useLinkVault() {
 
     const interval = setInterval(pollLinks, 1000); // Poll every 1 second for immediate click count updates
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn, selectedId, getToken]);
+  }, [isLoaded, isSignedIn, selectedId]);
 
   // Real-time polling for analytics updates
   useEffect(() => {
@@ -229,7 +229,7 @@ export default function useLinkVault() {
 
     const interval = setInterval(pollAnalytics, 5000); // Poll every 5 seconds for immediate analytics refresh
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn]);
 
   const selectedCollection = useMemo(
     () => collections.find((item) => item.id === selectedId) || null,

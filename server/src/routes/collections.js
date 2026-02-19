@@ -8,7 +8,7 @@ const router = express.Router();
 // ✅ Create collection (user-owned)
 router.post("/", requireAuth(), async (req, res) => {
   try {
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
     const { name, is_public = false } = req.body;
 
     if (!name?.trim()) {
@@ -30,9 +30,9 @@ router.post("/", requireAuth(), async (req, res) => {
 });
 
 // ✅ Get only MY collections
-router.get("/", async (req, res) => {
+router.get("/", requireAuth(), async (req, res) => {
   try {
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
 
     const result = await pool.query(
       `SELECT c.*,
@@ -64,11 +64,11 @@ router.get("/", async (req, res) => {
 });
 
 // ✅ Update collection (ownership enforced)
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireAuth(), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, is_public } = req.body;
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
 
     if (!name?.trim()) {
       return res.status(400).json({ error: "name is required" });
@@ -87,10 +87,10 @@ router.put("/:id", async (req, res) => {
 });
 
 // ✅ Delete collection (ownership enforced)
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", requireAuth(), async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
 
     await pool.query("DELETE FROM collection_members WHERE collection_id=$1", [
       id,
@@ -107,10 +107,10 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-router.get("/:id/members", async (req, res) => {
+router.get("/:id/members", requireAuth(), async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
 
     const ownerCheck = await pool.query(
       "SELECT id FROM collections WHERE id=$1 AND user_id=$2",
@@ -133,10 +133,10 @@ router.get("/:id/members", async (req, res) => {
   }
 });
 
-router.post("/:id/share", async (req, res) => {
+router.post("/:id/share", requireAuth(), async (req, res) => {
   try {
     const { id } = req.params;
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
     const { memberUserId, role = "viewer" } = req.body;
 
     if (!memberUserId?.trim()) {
@@ -178,10 +178,10 @@ router.post("/:id/share", async (req, res) => {
   }
 });
 
-router.delete("/:id/members/:memberUserId", async (req, res) => {
+router.delete("/:id/members/:memberUserId", requireAuth(), async (req, res) => {
   try {
     const { id, memberUserId } = req.params;
-    const userId = req.auth.userId;
+    const userId = req.auth().userId;
 
     const ownerCheck = await pool.query(
       "SELECT id FROM collections WHERE id=$1 AND user_id=$2",
