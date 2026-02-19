@@ -71,15 +71,7 @@ The CI pipeline automatically runs on:
 2. Click the **Actions** tab
 3. Select the workflow run to see detailed logs
 
-### 6. Badge (Optional)
-
-Add this to your README.md:
-
-```markdown
-![CI](https://github.com/YOUR_USERNAME/LinkVault/actions/workflows/ci.yml/badge.svg)
-```
-
-### 7. Customization
+### 6. Customization
 
 **Adjust polling intervals:**
 
@@ -91,7 +83,7 @@ Add this to your README.md:
 - PostgreSQL version: 16 (configurable in `services.postgres.image`)
 - Test database: `linkvault_test`
 
-### 8. Troubleshooting
+### 7. Troubleshooting
 
 | Issue                             | Solution                                                |
 | --------------------------------- | ------------------------------------------------------- |
