@@ -1,11 +1,12 @@
 import express from "express";
 import { pool } from "../config/db.js";
+import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
-router.get("/overview", async (req, res) => {
+router.get("/overview", requireAuth(), async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const days = Math.max(1, Math.min(365, Number(req.query.days || 30)));
 
     const summaryResult = await pool.query(

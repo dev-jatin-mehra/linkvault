@@ -1,6 +1,7 @@
 import express from "express";
 import { randomUUID } from "crypto";
 import { pool } from "../config/db.js";
+import { requireAuth } from "@clerk/express";
 
 const router = express.Router();
 
@@ -107,7 +108,7 @@ router.post("/", async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { collection_id, url, title = "", tags = [] } = req.body;
     const id = randomUUID();
 
@@ -145,7 +146,7 @@ router.post("/", async (req, res) => {
 
 router.get("/search", async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const q = String(req.query.q || "").trim();
     const limit = Math.max(1, Math.min(50, Number(req.query.limit || 20)));
 
@@ -190,7 +191,7 @@ router.get("/search", async (req, res) => {
 // ✅ Get links only if collection belongs to user
 router.get("/:collectionId", async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { collectionId } = req.params;
 
     const viewAccess = await canViewCollection(userId, collectionId);
@@ -223,7 +224,7 @@ router.put("/:id", async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { id } = req.params;
     const { url, title = "", tags = [] } = req.body;
 
@@ -270,7 +271,7 @@ router.put("/:id", async (req, res) => {
 // ✅ Delete link
 router.delete("/:id", async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { id } = req.params;
 
     await pool.query(
@@ -300,7 +301,7 @@ router.post("/:id/click", async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const userId = req.userId;
+    const userId = req.auth.userId;
     const { id } = req.params;
 
     const linkResult = await pool.query(
