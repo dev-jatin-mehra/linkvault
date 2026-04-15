@@ -141,16 +141,17 @@ export default function HomePage() {
           </p>
 
           <div className="hero-animate mt-8 flex flex-wrap gap-3">
-            <button
-              onClick={() => navigate("/login")}
-              className="rounded-lg px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5"
-              style={{
-                backgroundColor: "var(--text)",
-                color: "var(--bg)",
-              }}
-            >
-              Get Started Free
-            </button>
+            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+              <button
+                className="rounded-lg px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5"
+                style={{
+                  backgroundColor: "var(--text)",
+                  color: "var(--bg)",
+                }}
+              >
+                Get Started Free
+              </button>
+            </SignInButton>
           </div>
         </section>
 
