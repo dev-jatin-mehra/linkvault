@@ -11,7 +11,6 @@ import accountRoutes from "./routes/account.js";
 const app = express();
 
 const allowedOrigins = (
-  process.env.CLIENT_URLS ||
   process.env.CLIENT_URL ||
   "http://localhost:5173"
 )
