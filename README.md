@@ -56,9 +56,11 @@ VITE_APP_URL=https://your-frontend-domain.com
 DATABASE_URL=postgresql://postgres:password@localhost:5432/linkvault
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-CLIENT_URL=http://localhost:5173
+CLIENT_URLS=https://your-frontend-domain.com,http://localhost:5173
 NODE_ENV=development
 ```
+
+Set `CLIENT_URLS` to include your deployed frontend domain and any local dev URLs you use.
 
 For deployed auth flows, also update Supabase Auth settings so the Site URL and allowed redirect URLs include your deployed frontend domain.
 Use `/auth/callback` as the redirect path for Google sign-in and email verification.
