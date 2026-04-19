@@ -76,6 +76,10 @@ cd server
 npm run migrate
 ```
 
+If your backend is already deployed, run the same migration command once against the production `DATABASE_URL` before expecting create/update endpoints to work.
+
+For Vercel deployments of the server project, set the build command to `npm run build` so migrations run during deployment.
+
 ### 4. Start Development Servers
 
 ```bash
