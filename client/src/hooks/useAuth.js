@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
         email: normalizedEmail,
         password,
         options: {
-          emailRedirectTo: `${appUrl}/dashboard`,
+          emailRedirectTo: `${appUrl}/auth/callback`,
           data: {
             full_name: fullName.trim(),
             name: fullName.trim(),
@@ -118,7 +118,7 @@ export function AuthProvider({ children }) {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${appUrl}/dashboard`,
+        redirectTo: `${appUrl}/auth/callback`,
       },
     });
 

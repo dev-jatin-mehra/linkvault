@@ -61,6 +61,7 @@ NODE_ENV=development
 ```
 
 For deployed auth flows, also update Supabase Auth settings so the Site URL and allowed redirect URLs include your deployed frontend domain.
+Use `/auth/callback` as the redirect path for Google sign-in and email verification.
 
 ### 3. Setup Database
 
