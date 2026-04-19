@@ -16,6 +16,12 @@ export default function AuthPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const normalizeEmail = (value = "") => value.trim().toLowerCase();
+  const getAppUrl = () => {
+    return (
+      import.meta.env.VITE_APP_URL ||
+      (typeof window !== "undefined" ? window.location.origin : "")
+    );
+  };
 
   const isValidEmail = (value) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(value);
@@ -68,7 +74,7 @@ export default function AuthPage() {
         return;
       }
 
-      await signUp(normalizedEmail, password, fullName.trim());
+      await signUp(normalizedEmail, password, fullName.trim(), getAppUrl());
       setMessage(
         "Account created. Check your email for verification if your project requires confirmation.",
       );

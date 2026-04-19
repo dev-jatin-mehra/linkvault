@@ -46,6 +46,8 @@ Use `client/.env.example` as the template.
 ```env
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
+VITE_API_URL=https://your-backend-domain.com
+VITE_APP_URL=https://your-frontend-domain.com
 ```
 
 **Server (`server/.env`):**
@@ -57,6 +59,8 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 CLIENT_URL=http://localhost:5173
 NODE_ENV=development
 ```
+
+For deployed auth flows, also update Supabase Auth settings so the Site URL and allowed redirect URLs include your deployed frontend domain.
 
 ### 3. Setup Database
 

@@ -13,6 +13,12 @@ import { deleteMyAccount as deleteMyAccountApi } from "../api/api";
 const AuthContext = createContext(null);
 
 const normalizeEmail = (email = "") => String(email).trim().toLowerCase();
+const getAppUrl = () => {
+  return (
+    import.meta.env.VITE_APP_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "")
+  );
+};
 
 export function AuthProvider({ children }) {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -63,47 +69,56 @@ export function AuthProvider({ children }) {
     if (error) throw error;
   }, []);
 
-  const signUp = useCallback(async (email, password, fullName = "") => {
-    const normalizedEmail = normalizeEmail(email);
+  const signUp = useCallback(
+    async (email, password, fullName = "", appUrl = getAppUrl()) => {
+      const normalizedEmail = normalizeEmail(email);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: normalizedEmail,
-      password,
-      options: {
-        data: {
-          full_name: fullName.trim(),
-          name: fullName.trim(),
+      const { data, error } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password,
+        options: {
+          emailRedirectTo: `${appUrl}/dashboard`,
+          data: {
+            full_name: fullName.trim(),
+            name: fullName.trim(),
+          },
         },
-      },
-    });
+      });
 
-    const errorMessage = String(error?.message || "").toLowerCase();
-    if (error) {
-      if (errorMessage.includes("already") || errorMessage.includes("exists")) {
+      const errorMessage = String(error?.message || "").toLowerCase();
+      if (error) {
+        if (
+          errorMessage.includes("already") ||
+          errorMessage.includes("exists")
+        ) {
+          throw new Error(
+            "An account with this email already exists. Please sign in.",
+          );
+        }
+
+        throw error;
+      }
+
+      // Supabase may return an obfuscated user object for existing users.
+      if (
+        Array.isArray(data?.user?.identities) &&
+        data.user.identities.length === 0
+      ) {
         throw new Error(
           "An account with this email already exists. Please sign in.",
         );
       }
-
-      throw error;
-    }
-
-    // Supabase may return an obfuscated user object for existing users.
-    if (
-      Array.isArray(data?.user?.identities) &&
-      data.user.identities.length === 0
-    ) {
-      throw new Error(
-        "An account with this email already exists. Please sign in.",
-      );
-    }
-  }, []);
+    },
+    [],
+  );
 
   const signInWithGoogle = useCallback(async () => {
+    const appUrl = getAppUrl();
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: `${appUrl}/dashboard`,
       },
     });
 
@@ -140,6 +155,7 @@ export function AuthProvider({ children }) {
   }, [getToken]);
 
   const requestPasswordReset = useCallback(async () => {
+    const appUrl = getAppUrl();
     const { data } = await supabase.auth.getSession();
     const email = data.session?.user?.email || user?.email;
 
@@ -148,7 +164,7 @@ export function AuthProvider({ children }) {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: `${appUrl}/login`,
     });
 
     if (error) throw error;
