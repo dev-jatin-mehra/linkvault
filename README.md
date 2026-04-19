@@ -97,7 +97,6 @@ Open [http://localhost:5173](http://localhost:5173)
 - Clerk Express SDK
 - Node-postgres-supabase
 
-
 ## 📚 Documentation
 
 - [CI/CD Setup](.github/CI_SETUP.md) - GitHub Actions configuration
