@@ -35,7 +35,10 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          VITE_CLERK_PUBLISHABLE_KEY: ${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_ANON_KEY: test-anon-key
+          VITE_API_URL: http://localhost:4000
+          VITE_APP_URL: http://localhost:5173
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -81,11 +84,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Check for syntax errors
-        run: |
-          node --check src/index.js
-          node --check src/scripts/migrate.js
-          node --check src/scripts/check-schema.js
+      - name: Run server lint
+        run: npm run lint
 
       - name: Validate migration files
         run: |
@@ -108,8 +108,8 @@ jobs:
         run: npm run migrate
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/linkvault_test
-          CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-          CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY }}
+          SUPABASE_URL: https://example.supabase.co
+          CLIENT_URLS: http://localhost:5173
 
       - name: Verify schema integrity
         run: node src/scripts/check-schema.js
