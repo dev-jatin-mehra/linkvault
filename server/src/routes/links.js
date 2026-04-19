@@ -274,7 +274,7 @@ router.delete("/:id", requireAuth(), async (req, res) => {
     const userId = req.auth().userId;
     const { id } = req.params;
 
-    await pool.query(
+    const deleteResult = await pool.query(
       `DELETE FROM links
        WHERE id = $1
          AND collection_id IN (
@@ -283,12 +283,14 @@ router.delete("/:id", requireAuth(), async (req, res) => {
            LEFT JOIN collection_members cm
              ON cm.collection_id = c.id AND cm.user_id = $2
            WHERE c.user_id = $2 OR cm.user_id IS NOT NULL
-         )`,
+         )
+       RETURNING id`,
       [id, userId],
     );
 
-    await pool.query("DELETE FROM link_tags WHERE link_id=$1", [id]);
-    await pool.query("DELETE FROM click_events WHERE link_id=$1", [id]);
+    if (!deleteResult.rowCount) {
+      return res.status(403).json({ error: "not allowed to delete link" });
+    }
 
     res.json({ ok: true });
   } catch (error) {
@@ -297,7 +299,7 @@ router.delete("/:id", requireAuth(), async (req, res) => {
   }
 });
 
-router.post("/:id/click", async (req, res) => {
+router.post("/:id/click", requireAuth(), async (req, res) => {
   const client = await pool.connect();
 
   try {

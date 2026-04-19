@@ -12,8 +12,9 @@ export const pool = new Pool({
   connectionString,
   family: 4,
   ssl:
-    process.env.NODE_ENV === "production" ||
-    /sslmode=require|sslmode=verify-full/i.test(connectionString)
-      ? { rejectUnauthorized: false }
-      : false,
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: true }
+      : /sslmode=require|sslmode=verify-full/i.test(connectionString)
+        ? { rejectUnauthorized: false }
+        : false,
 });

@@ -7,6 +7,7 @@ import collectionsRoutes from "./routes/collections.js";
 import linksRoutes from "./routes/links.js";
 import analyticsRoutes from "./routes/analytics.js";
 import publicRoutes from "./routes/public.js";
+import { pool } from "./config/db.js";
 
 dotenv.config();
 
@@ -34,6 +35,19 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on ${PORT}`);
-});
+
+const startServer = async () => {
+  try {
+    await pool.query("SELECT 1");
+    console.log("Supabase Connected");
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Failed to connect to Supabase", error);
+    process.exit(1);
+  }
+};
+
+startServer();

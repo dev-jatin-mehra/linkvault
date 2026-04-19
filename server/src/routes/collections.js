@@ -92,9 +92,17 @@ router.delete("/:id", requireAuth(), async (req, res) => {
     const { id } = req.params;
     const userId = req.auth().userId;
 
-    await pool.query("DELETE FROM collection_members WHERE collection_id=$1", [
-      id,
-    ]);
+    const ownerCheck = await pool.query(
+      "SELECT id FROM collections WHERE id=$1 AND user_id=$2",
+      [id, userId],
+    );
+
+    if (!ownerCheck.rowCount) {
+      return res
+        .status(403)
+        .json({ error: "only owner can delete collection" });
+    }
+
     await pool.query("DELETE FROM collections WHERE id=$1 AND user_id=$2", [
       id,
       userId,

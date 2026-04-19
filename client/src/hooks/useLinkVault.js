@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "./useAuth";
 import {
@@ -81,7 +80,7 @@ export default function useLinkVault() {
     };
 
     loadCollections();
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   useEffect(() => {
     const loadLinks = async () => {
@@ -105,7 +104,7 @@ export default function useLinkVault() {
     };
 
     loadLinks();
-  }, [selectedId, isLoaded, isSignedIn]);
+  }, [selectedId, isLoaded, isSignedIn, getToken]);
 
   useEffect(() => {
     const loadMembers = async () => {
@@ -128,7 +127,7 @@ export default function useLinkVault() {
     };
 
     loadMembers();
-  }, [selectedId, isLoaded, isSignedIn]);
+  }, [selectedId, isLoaded, isSignedIn, getToken]);
 
   useEffect(() => {
     const loadAnalytics = async () => {
@@ -147,7 +146,7 @@ export default function useLinkVault() {
     };
 
     loadAnalytics();
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   useEffect(() => {
     const runSearch = async () => {
@@ -176,13 +175,15 @@ export default function useLinkVault() {
 
     const timer = setTimeout(runSearch, 180);
     return () => clearTimeout(timer);
-  }, [searchQuery, isSignedIn]);
+  }, [searchQuery, isSignedIn, getToken]);
 
   // Real-time polling for collections updates
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
 
     const pollCollections = async () => {
+      if (document.visibilityState === "hidden") return;
+
       try {
         const token = await getToken();
         const nextCollections = await getCollections(token);
@@ -192,15 +193,17 @@ export default function useLinkVault() {
       }
     };
 
-    const interval = setInterval(pollCollections, 2000); // Poll every 2 seconds for immediate updates
+    const interval = setInterval(pollCollections, 10000);
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   // Real-time polling for links updates (click counts, new links)
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !selectedId) return;
 
     const pollLinks = async () => {
+      if (document.visibilityState === "hidden") return;
+
       try {
         const token = await getToken();
         const nextLinks = await getLinks(selectedId, token);
@@ -210,15 +213,17 @@ export default function useLinkVault() {
       }
     };
 
-    const interval = setInterval(pollLinks, 1000); // Poll every 1 second for immediate click count updates
+    const interval = setInterval(pollLinks, 5000);
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn, selectedId]);
+  }, [isLoaded, isSignedIn, selectedId, getToken]);
 
   // Real-time polling for analytics updates
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
 
     const pollAnalytics = async () => {
+      if (document.visibilityState === "hidden") return;
+
       try {
         const token = await getToken();
         const data = await getAnalyticsOverview(token);
@@ -228,9 +233,9 @@ export default function useLinkVault() {
       }
     };
 
-    const interval = setInterval(pollAnalytics, 5000); // Poll every 5 seconds for immediate analytics refresh
+    const interval = setInterval(pollAnalytics, 30000);
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, getToken]);
 
   const selectedCollection = useMemo(
     () => collections.find((item) => item.id === selectedId) || null,
