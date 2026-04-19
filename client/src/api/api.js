@@ -146,6 +146,16 @@ export const getAnalyticsOverview = async (token, days = 30) => {
   return apiFetch(`/analytics/overview?days=${days}`, {}, token);
 };
 
+export const deleteMyAccount = async (token) => {
+  return apiFetch(
+    "/account",
+    {
+      method: "DELETE",
+    },
+    token,
+  );
+};
+
 // Public API endpoints (no auth required)
 export const getPublicCollection = async (id) => {
   return apiFetch(`/public/collections/${id}`, {});

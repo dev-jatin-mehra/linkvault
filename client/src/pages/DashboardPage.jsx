@@ -61,7 +61,7 @@ export default function DashboardPage() {
       style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
     >
       <main className="mx-auto max-w-6xl">
-        <div className="dash-animate">
+        <div className="dash-animate relative z-30">
           <AppHeader />
         </div>
 

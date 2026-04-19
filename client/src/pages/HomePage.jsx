@@ -1,4 +1,3 @@
-import { SignedIn, SignedOut, SignInButton } from "@clerk/clerk-react";
 import { gsap } from "gsap";
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -83,26 +82,19 @@ export default function HomePage() {
                   className="h-9 w-24 rounded-lg border"
                   style={{ borderColor: "var(--border)" }}
                 />
+              ) : isSignedIn ? (
+                <div className="h-9 w-24" />
               ) : (
-                <>
-                  <SignedOut>
-                    <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-                      <button
-                        className="h-9 rounded-lg px-4 text-sm font-semibold transition hover:-translate-y-0.5"
-                        style={{
-                          backgroundColor: "var(--text)",
-                          color: "var(--bg)",
-                        }}
-                      >
-                        Sign in
-                      </button>
-                    </SignInButton>
-                  </SignedOut>
-
-                  <SignedIn>
-                    <div className="h-9 w-24" />
-                  </SignedIn>
-                </>
+                <button
+                  className="h-9 rounded-lg px-4 text-sm font-semibold transition hover:-translate-y-0.5"
+                  style={{
+                    backgroundColor: "var(--text)",
+                    color: "var(--bg)",
+                  }}
+                  onClick={() => navigate("/login")}
+                >
+                  Sign in
+                </button>
               )}
             </div>
           </div>
@@ -141,17 +133,16 @@ export default function HomePage() {
           </p>
 
           <div className="hero-animate mt-8 flex flex-wrap gap-3">
-            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-              <button
-                className="rounded-lg px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5"
-                style={{
-                  backgroundColor: "var(--text)",
-                  color: "var(--bg)",
-                }}
-              >
-                Get Started Free
-              </button>
-            </SignInButton>
+            <button
+              className="rounded-lg px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5"
+              style={{
+                backgroundColor: "var(--text)",
+                color: "var(--bg)",
+              }}
+              onClick={() => navigate("/login")}
+            >
+              Get Started Free
+            </button>
           </div>
         </section>
 

@@ -12,7 +12,7 @@ Modern link management application with real-time updates, public sharing, and a
 - 📊 **Analytics** - Track clicks and view usage statistics
 - ⚡ **Real-Time Updates** - See changes instantly (1-2 second sync)
 - 🎨 **Dark Mode** - Elegant light/dark theme with smooth animations
-- 🔐 **Secure Auth** - Powered by Clerk authentication
+- 🔐 **Secure Auth** - Powered by Supabase Auth
 
 ## 🚀 Quick Start (Local Development)
 
@@ -20,7 +20,7 @@ Modern link management application with real-time updates, public sharing, and a
 
 - Node.js 20+
 - PostgreSQL 16+
-- Clerk account (free tier)
+- Supabase project (free tier works)
 
 ### 1. Clone & Install
 
@@ -41,16 +41,19 @@ npm install
 
 **Client (`client/.env`):**
 
+Use `client/.env.example` as the template.
+
 ```env
-VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_test_key
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-public-key
 ```
 
 **Server (`server/.env`):**
 
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5432/linkvault
-CLERK_SECRET_KEY=sk_test_your_test_secret
-CLERK_PUBLISHABLE_KEY=pk_test_your_test_key
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 CLIENT_URL=http://localhost:5173
 NODE_ENV=development
 ```
@@ -88,13 +91,13 @@ Open [http://localhost:5173](http://localhost:5173)
 - Tailwind CSS 4
 - GSAP animations
 - React Router 7
-- Clerk React SDK
+- Supabase JS SDK
 
 **Backend:**
 
 - Express 5.2
 - PostgreSQL with UUID keys
-- Clerk Express SDK
+- Supabase JWT verification via JOSE
 - Node-postgres-supabase
 
 ## 📚 Documentation
@@ -125,7 +128,7 @@ LinkVault/
 
 ## 🔐 Security
 
-- Clerk authentication with JWT tokens
+- Supabase authentication with JWT tokens
 - CORS protection
 - SQL injection prevention (parameterized queries)
 - Foreign key constraints for data integrity
@@ -139,7 +142,7 @@ npm run lint
 npm run build
 
 cd ../server
-node --check src/index.js
+npm run lint
 npm run migrate
 ```
 
@@ -164,7 +167,6 @@ This project is licensed under the MIT License.
 
 ## 🙏 Acknowledgments
 
-- [Clerk](https://dashboard.clerk.com) - Authentication
 - [Supabase](https://supabase.com) - DB Hosted
 
 ---

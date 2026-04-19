@@ -54,6 +54,15 @@ export default function useLinkVault() {
 
       try {
         const token = await getToken();
+        if (!token) {
+          setCollections([]);
+          setSelectedId(null);
+          setLinks([]);
+          setMembers([]);
+          setError("Session not ready. Please sign in again.");
+          return;
+        }
+
         const nextCollections = await getCollections(token);
         setCollections(nextCollections);
 

@@ -1,12 +1,12 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { clerkMiddleware } from "@clerk/express";
 
 import collectionsRoutes from "./routes/collections.js";
 import linksRoutes from "./routes/links.js";
 import analyticsRoutes from "./routes/analytics.js";
 import publicRoutes from "./routes/public.js";
+import accountRoutes from "./routes/account.js";
 
 const app = express();
 
@@ -17,9 +17,9 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(clerkMiddleware());
 
 app.use("/api/public", publicRoutes);
+app.use("/api/account", accountRoutes);
 app.use("/api/collections", collectionsRoutes);
 app.use("/api/links", linksRoutes);
 app.use("/api/analytics", analyticsRoutes);
