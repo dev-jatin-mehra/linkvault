@@ -1,4 +1,5 @@
 import { pool } from "../config/db.js";
+import { trackPublicLinkClick as trackPublicLinkClickService } from "./linkService.js";
 
 export const getPublicCollection = async (id) => {
   const result = await pool.query(
@@ -38,4 +39,8 @@ export const getPublicCollectionLinks = async (id) => {
   );
 
   return result.rows;
+};
+
+export const trackPublicLinkClick = async (id, metadata) => {
+  return trackPublicLinkClickService(id, metadata);
 };
