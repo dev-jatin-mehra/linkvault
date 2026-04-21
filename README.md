@@ -2,19 +2,19 @@
 
 Modern link management application with real-time updates, public sharing, and analytics.
 
-## ✨ Features
+## Features
 
-- 📚 **Organize Links** - Create collections to categorize your links
-- 🏷️ **Tag System** - Add multiple tags to links for easy filtering
-- 🔍 **Instant Search** - Search across links, tags, and collections
-- 🌐 **Public Sharing** - Share collections with anyone (no login required)
-- 👥 **Team Collaboration** - Invite members with Viewer/Editor/Admin roles
-- 📊 **Analytics** - Track clicks and view usage statistics
-- ⚡ **Real-Time Updates** - See changes instantly (1-2 second sync)
-- 🎨 **Dark Mode** - Elegant light/dark theme with smooth animations
-- 🔐 **Secure Auth** - Powered by Supabase Auth
+- **Organize Links** - Create collections to categorize your links
+- **Tag System** - Add multiple tags to links for easy filtering
+- **Instant Search** - Search across links, tags, and collections
+- **Public Sharing** - Share collections with anyone (no login required)
+- **Team Collaboration** - Invite members with Viewer/Editor/Admin roles
+- **Analytics** - Track clicks and view usage statistics
+- **Real-Time Updates** - See changes instantly (1-2 second sync)
+- **Dark Mode** - Elegant light/dark theme with smooth animations
+- **Secure Auth** - Powered by Supabase Auth
 
-## 🚀 Quick Start (Local Development)
+## Quick Start (Local Development)
 
 ### Prerequisites
 
@@ -55,12 +55,11 @@ VITE_APP_URL=https://your-frontend-domain.com
 ```env
 DATABASE_URL=postgresql://postgres:password@localhost:5432/linkvault
 SUPABASE_URL=https://your-project-ref.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-CLIENT_URLS=https://your-frontend-domain.com,http://localhost:5173
+CLIENT_URL=https://your-frontend-domain.com,http://localhost:5173
 NODE_ENV=development
 ```
 
-Set `CLIENT_URLS` to include your deployed frontend domain and any local dev URLs you use.
+Set `CLIENT_URL` to include your deployed frontend domain and any local dev URLs you use.
 
 For deployed auth flows, also update Supabase Auth settings so the Site URL and allowed redirect URLs include your deployed frontend domain.
 Use `/auth/callback` as the redirect path for Google sign-in and email verification.
@@ -78,8 +77,6 @@ npm run migrate
 
 If your backend is already deployed, run the same migration command once against the production `DATABASE_URL` before expecting create/update endpoints to work.
 
-For Vercel deployments of the server project, set the build command to `npm run build` so migrations run during deployment.
-
 ### 4. Start Development Servers
 
 ```bash
@@ -94,7 +91,7 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173)
 
-## 📦 Tech Stack
+## Tech Stack
 
 **Frontend:**
 
@@ -114,15 +111,15 @@ Open [http://localhost:5173](http://localhost:5173)
 - **Prometheus** - Metrics collection
 - **Grafana** - Dashboards & visualization
 
-## 🔍 Monitoring & Observability
+## Monitoring & Observability
 
 LinkVault includes production-grade monitoring with **free, open-source tools**:
 
 ### Quick Start
 
 ```bash
-# Start the full monitoring stack
-docker-compose up -d
+# Start the full monitoring stack(Docker installed systems)
+docker compose up -d
 
 # Access dashboards:
 # - Prometheus: http://localhost:9090 (metrics)
@@ -145,7 +142,7 @@ See [Monitoring Guide](monitoring/README.md) for details.
 - [CI/CD Setup](.github/CI_SETUP.md) - GitHub Actions configuration
 - [Monitoring Setup](monitoring/README.md) - Observability guide
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 LinkVault/
@@ -155,26 +152,26 @@ LinkVault/
 │   │   ├── components/ # React components
 │   │   ├── hooks/      # Custom hooks
 │   │   └── pages/      # Route pages
-│   └── .env.production # Production env template
+│   └── .env.example    # Production env template
 ├── server/              # Express backend
 │   ├── src/
 │   │   ├── config/     # Database config
 │   │   ├── routes/     # API routes
 │   │   └── scripts/    # Utility scripts
 │   ├── migrations/     # SQL migrations
-│   └── .env.production.example
+│   └── .env.example
 └── .github/
     └── workflows/      # CI/CD pipelines
 ```
 
-## 🔐 Security
+## Security
 
 - Supabase authentication with JWT tokens
 - CORS protection
 - SQL injection prevention (parameterized queries)
 - Foreign key constraints for data integrity
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run CI checks locally
@@ -187,14 +184,14 @@ npm run lint
 npm run migrate
 ```
 
-## 📈 Performance
+## Performance
 
 - **Real-time polling:** 1-2 second sync for changes
 - **Optimistic updates:** Instant UI feedback
 - **Efficient queries:** Indexed database columns
 - **Minimal bundle:** Tree-shaking with Vite
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -202,14 +199,15 @@ npm run migrate
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Supabase](https://supabase.com) - DB Hosted
 
 ---
 
 Built with ❤️ using React, Express, and PostgreSQL
+and error handling with Claude
