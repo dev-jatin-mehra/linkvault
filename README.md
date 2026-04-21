@@ -59,6 +59,8 @@ CLIENT_URL=https://your-frontend-domain.com,http://localhost:5173
 NODE_ENV=development
 ```
 
+Copy the server .env file and paste in the root folder.
+
 Set `CLIENT_URL` to include your deployed frontend domain and any local dev URLs you use.
 
 For deployed auth flows, also update Supabase Auth settings so the Site URL and allowed redirect URLs include your deployed frontend domain.
