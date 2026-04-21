@@ -110,10 +110,40 @@ Open [http://localhost:5173](http://localhost:5173)
 - PostgreSQL with UUID keys
 - Supabase JWT verification via JOSE
 - Node-postgres-supabase
+- **Winston** - Structured logging
+- **Prometheus** - Metrics collection
+- **Grafana** - Dashboards & visualization
+
+## 🔍 Monitoring & Observability
+
+LinkVault includes production-grade monitoring with **free, open-source tools**:
+
+### Quick Start
+
+```bash
+# Start the full monitoring stack
+docker-compose up -d
+
+# Access dashboards:
+# - Prometheus: http://localhost:9090 (metrics)
+# - Grafana: http://localhost:3000 (dashboards)
+```
+
+**Grafana Login**: `admin` / `admin`
+
+### What's Being Monitored
+
+- **HTTP Requests**: Rate, latency (p50/p95/p99), errors
+- **Errors**: By type and route
+- **System**: CPU, memory, active connections
+- **Logs**: Structured JSON logs with rotation
+
+See [Monitoring Guide](monitoring/README.md) for details.
 
 ## 📚 Documentation
 
 - [CI/CD Setup](.github/CI_SETUP.md) - GitHub Actions configuration
+- [Monitoring Setup](monitoring/README.md) - Observability guide
 
 ## 🏗️ Project Structure
 
