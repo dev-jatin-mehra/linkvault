@@ -56,6 +56,7 @@ VITE_APP_URL=https://your-frontend-domain.com
 DATABASE_URL=postgresql://postgres:password@localhost:5432/linkvault
 SUPABASE_URL=https://your-project-ref.supabase.co
 CLIENT_URL=https://your-frontend-domain.com,http://localhost:5173
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-key
 NODE_ENV=development
 ```
 
