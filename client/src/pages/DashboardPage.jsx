@@ -185,18 +185,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLeftSliderChange = (event) => {
-    const nextValue = Number(event.target.value);
-    if (!Number.isFinite(nextValue)) return;
-    setLeftPanelWidth(clamp(nextValue, LEFT_PANEL_MIN, LEFT_PANEL_MAX));
-  };
-
-  const handleRightSliderChange = (event) => {
-    const nextValue = Number(event.target.value);
-    if (!Number.isFinite(nextValue)) return;
-    setRightPanelWidth(clamp(nextValue, RIGHT_PANEL_MIN, RIGHT_PANEL_MAX));
-  };
-
   const resetPanelWidths = () => {
     setLeftPanelWidth(LEFT_PANEL_DEFAULT);
     setRightPanelWidth(RIGHT_PANEL_DEFAULT);
@@ -389,67 +377,6 @@ export default function DashboardPage() {
               </div>
             ) : null}
           </>
-        ) : null}
-
-        {isWideLayout ? (
-          <section
-            className="dash-animate rounded-xl border px-4 py-3"
-            style={{
-              borderColor: "var(--border)",
-              backgroundColor: "var(--surface)",
-            }}
-          >
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <label
-                  htmlFor="left-panel-width"
-                  className="text-xs font-semibold uppercase"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  Collections Width ({leftPanelWidth}px)
-                </label>
-                <input
-                  id="left-panel-width"
-                  type="range"
-                  min={LEFT_PANEL_MIN}
-                  max={LEFT_PANEL_MAX}
-                  value={leftPanelWidth}
-                  onChange={handleLeftSliderChange}
-                />
-              </div>
-
-              <div className="flex min-w-0 flex-1 flex-col gap-2">
-                <label
-                  htmlFor="right-panel-width"
-                  className="text-xs font-semibold uppercase"
-                  style={{ color: "var(--text-muted)" }}
-                >
-                  Details Width ({rightPanelWidth}px)
-                </label>
-                <input
-                  id="right-panel-width"
-                  type="range"
-                  min={RIGHT_PANEL_MIN}
-                  max={RIGHT_PANEL_MAX}
-                  value={rightPanelWidth}
-                  onChange={handleRightSliderChange}
-                />
-              </div>
-
-              <button
-                type="button"
-                onClick={resetPanelWidths}
-                className="rounded-lg px-3 py-2 text-xs font-medium"
-                style={{
-                  border: `1px solid var(--border)`,
-                  backgroundColor: "transparent",
-                  color: "var(--text)",
-                }}
-              >
-                Reset Widths
-              </button>
-            </div>
-          </section>
         ) : null}
 
         {isWideLayout ? (

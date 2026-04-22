@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { playUiActionSound } from "../lib/uiClickSound";
 
 function normalizeTag(tag) {
   return String(tag || "")
@@ -101,6 +102,8 @@ export default function LinksPanel({
     event.preventDefault();
     const trimmedUrl = url.trim();
     if (!trimmedUrl) return;
+
+    playUiActionSound("primary");
 
     await onAddLink({
       url: trimmedUrl,

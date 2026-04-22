@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { playUiActionSound } from "../lib/uiClickSound";
 
 export default function CollectionPanel({
   collections,
@@ -19,6 +20,8 @@ export default function CollectionPanel({
     event.preventDefault();
     const trimmed = collectionName.trim();
     if (!trimmed) return;
+
+    playUiActionSound("primary");
 
     await onAddCollection(trimmed, newCollectionPublic);
     setCollectionName("");

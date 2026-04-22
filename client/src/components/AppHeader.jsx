@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { playUiActionSound } from "../lib/uiClickSound";
 import ThemeToggle from "./ThemeToggle";
 
 export default function AppHeader() {
@@ -81,6 +82,7 @@ export default function AppHeader() {
   };
 
   const handleDeleteAccount = async () => {
+    playUiActionSound("danger");
     setProfileMessage("");
 
     setIsDeleteConfirmOpen(false);
@@ -239,6 +241,7 @@ export default function AppHeader() {
                               backgroundColor: "#3f0a0a",
                             }}
                             onClick={() => {
+                              playUiActionSound("danger");
                               setIsMenuOpen(false);
                               setIsDeleteConfirmOpen(true);
                             }}

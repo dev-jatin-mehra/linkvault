@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { playUiActionSound } from "../lib/uiClickSound";
 import { useAuth } from "../hooks/useAuth";
 
 export default function AuthPage() {
@@ -85,6 +86,8 @@ export default function AuthPage() {
       setError("Password and confirm password do not match.");
       return;
     }
+
+    playUiActionSound("primary");
 
     setIsSubmitting(true);
 
