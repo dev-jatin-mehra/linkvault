@@ -23,7 +23,7 @@ scrape_configs:
   # LinkVault API server
   - job_name: "linkvault-api"
     static_configs:
-      - targets: ["api:4000"]
+      - targets: ["linkvault-backend-omega.vercel.app"]
     metrics_path: "/metrics"
     scrape_interval: 15s
     scrape_timeout: 10s
