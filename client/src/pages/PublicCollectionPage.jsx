@@ -47,6 +47,8 @@ export default function PublicCollectionPage() {
     if (!id || error || isLoading) return;
 
     const pollLinks = async () => {
+      if (document.visibilityState === "hidden") return;
+
       try {
         const linksData = await getPublicCollectionLinks(id);
         setLinks(linksData);
@@ -55,20 +57,35 @@ export default function PublicCollectionPage() {
       }
     };
 
-    const interval = setInterval(pollLinks, 1000); // Poll every 1 second for immediate updates
+    const interval = setInterval(pollLinks, 5000);
     return () => clearInterval(interval);
   }, [id, error, isLoading]);
 
   const normalizeUrl = (url) => {
     if (!url) return "";
     const trimmed = url.trim();
-    if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
-      return trimmed;
+
+    try {
+      const parsed = new URL(
+        trimmed.startsWith("http://") || trimmed.startsWith("https://")
+          ? trimmed
+          : `https://${trimmed}`,
+      );
+
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        return "";
+      }
+
+      return parsed.toString();
+    } catch {
+      return "";
     }
-    return `https://${trimmed}`;
   };
 
   const handleLinkClick = async (linkId, url) => {
+    const safeUrl = normalizeUrl(url);
+    if (!safeUrl) return;
+
     // Optimistic update - increment click count immediately
     setLinks((prev) =>
       prev.map((link) =>
@@ -79,7 +96,7 @@ export default function PublicCollectionPage() {
     );
 
     // Open link immediately (don't wait for API)
-    window.open(normalizeUrl(url), "_blank", "noopener,noreferrer");
+    window.open(safeUrl, "_blank", "noopener,noreferrer");
 
     // Track click in background
     try {

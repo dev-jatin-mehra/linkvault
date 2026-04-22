@@ -138,14 +138,14 @@ export default function useLinkVault() {
 
   useEffect(() => {
     const loadAnalytics = async () => {
-      if (!isLoaded || !isSignedIn) {
+      if (!isLoaded || !isSignedIn || !selectedId) {
         setAnalytics(null);
         return;
       }
 
       try {
         const token = await getToken();
-        const data = await getAnalyticsOverview(token);
+        const data = await getAnalyticsOverview(token, 30, selectedId);
         setAnalytics(data);
       } catch {
         setAnalytics(null);
@@ -153,7 +153,7 @@ export default function useLinkVault() {
     };
 
     loadAnalytics();
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn, selectedId, getToken]);
 
   useEffect(() => {
     const runSearch = async () => {
@@ -226,14 +226,14 @@ export default function useLinkVault() {
 
   // Real-time polling for analytics updates
   useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
+    if (!isLoaded || !isSignedIn || !selectedId) return;
 
     const pollAnalytics = async () => {
       if (document.visibilityState === "hidden") return;
 
       try {
         const token = await getToken();
-        const data = await getAnalyticsOverview(token);
+        const data = await getAnalyticsOverview(token, 30, selectedId);
         setAnalytics(data);
       } catch {
         // Silent failure for background polling
@@ -242,7 +242,7 @@ export default function useLinkVault() {
 
     const interval = setInterval(pollAnalytics, 30000);
     return () => clearInterval(interval);
-  }, [isLoaded, isSignedIn, getToken]);
+  }, [isLoaded, isSignedIn, selectedId, getToken]);
 
   const selectedCollection = useMemo(
     () => collections.find((item) => item.id === selectedId) || null,

@@ -142,8 +142,17 @@ export const trackLinkClick = async (id, token) => {
   );
 };
 
-export const getAnalyticsOverview = async (token, days = 30) => {
-  return apiFetch(`/analytics/overview?days=${days}`, {}, token);
+export const getAnalyticsOverview = async (
+  token,
+  days = 30,
+  collectionId = null,
+) => {
+  const params = new URLSearchParams({ days: String(days) });
+  if (collectionId) {
+    params.set("collectionId", collectionId);
+  }
+
+  return apiFetch(`/analytics/overview?${params.toString()}`, {}, token);
 };
 
 export const deleteMyAccount = async (token) => {

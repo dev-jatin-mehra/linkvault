@@ -1,6 +1,10 @@
 import { pool } from "../config/db.js";
 
-export const getAnalyticsOverview = async (userId, days) => {
+export const getAnalyticsOverview = async (
+  userId,
+  days,
+  collectionId = null,
+) => {
   const summaryResult = await pool.query(
     `SELECT
        COUNT(DISTINCT c.id)::INT AS total_collections,
@@ -11,8 +15,9 @@ export const getAnalyticsOverview = async (userId, days) => {
        ON cm.collection_id = c.id AND cm.user_id = $1
      LEFT JOIN links l
        ON l.collection_id = c.id
-     WHERE c.user_id = $1 OR cm.user_id IS NOT NULL`,
-    [userId],
+     WHERE (c.user_id = $1 OR cm.user_id IS NOT NULL)
+       AND ($2::UUID IS NULL OR c.id = $2::UUID)`,
+    [userId, collectionId],
   );
 
   const topLinksResult = await pool.query(
@@ -25,10 +30,11 @@ export const getAnalyticsOverview = async (userId, days) => {
      JOIN collections c ON c.id = l.collection_id
      LEFT JOIN collection_members cm
        ON cm.collection_id = c.id AND cm.user_id = $1
-     WHERE c.user_id = $1 OR cm.user_id IS NOT NULL
+     WHERE (c.user_id = $1 OR cm.user_id IS NOT NULL)
+       AND ($2::UUID IS NULL OR c.id = $2::UUID)
      ORDER BY l.click_count DESC, l.created_at DESC
      LIMIT 10`,
-    [userId],
+    [userId, collectionId],
   );
 
   const clicksByDayResult = await pool.query(
@@ -40,10 +46,11 @@ export const getAnalyticsOverview = async (userId, days) => {
      LEFT JOIN collection_members cm
        ON cm.collection_id = c.id AND cm.user_id = $1
      WHERE (c.user_id = $1 OR cm.user_id IS NOT NULL)
-       AND ce.clicked_at >= NOW() - ($2::TEXT || ' days')::INTERVAL
+       AND ($2::UUID IS NULL OR c.id = $2::UUID)
+       AND ce.clicked_at >= NOW() - ($3::TEXT || ' days')::INTERVAL
      GROUP BY ce.clicked_at::DATE
      ORDER BY day ASC`,
-    [userId, days],
+    [userId, collectionId, days],
   );
 
   return {

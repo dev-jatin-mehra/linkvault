@@ -3,31 +3,17 @@ import { useState } from "react";
 export default function CollectionPanel({
   collections,
   selectedId,
-  selectedCollection,
-  members,
   onSelect,
   onAddCollection,
   onEditCollection,
   onDeleteCollection,
-  onToggleVisibility,
-  onShareMember,
-  onRemoveMember,
   isLoading,
-  isMembersLoading,
 }) {
   const [collectionName, setCollectionName] = useState("");
   const [newCollectionPublic, setNewCollectionPublic] = useState(false);
   const [editingCollectionId, setEditingCollectionId] = useState(null);
   const [editingName, setEditingName] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
-  const [shareEmail, setShareEmail] = useState("");
-  const [shareRole, setShareRole] = useState("viewer");
-  const [copyLinkFeedback, setCopyLinkFeedback] = useState(false);
-  const [generatedLinkState, setGeneratedLinkState] = useState({
-    collectionId: null,
-    url: "",
-  });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -37,33 +23,6 @@ export default function CollectionPanel({
     await onAddCollection(trimmed, newCollectionPublic);
     setCollectionName("");
     setNewCollectionPublic(false);
-  };
-
-  const handleShare = async (event) => {
-    event.preventDefault();
-    if (!selectedCollection || !shareEmail.trim()) return;
-
-    await onShareMember(selectedCollection.id, shareEmail.trim(), shareRole);
-    setShareEmail("");
-    setShareRole("viewer");
-  };
-
-  const handleGenerateShareLink = () => {
-    if (!selectedCollection) return;
-    setGeneratedLinkState({
-      collectionId: selectedCollection.id,
-      url: `${window.location.origin}/collection/${selectedCollection.id}`,
-    });
-    setCopyLinkFeedback(false);
-  };
-
-  const handleCopyShareLink = () => {
-    if (!generatedLinkState.url) return;
-
-    navigator.clipboard.writeText(generatedLinkState.url).then(() => {
-      setCopyLinkFeedback(true);
-      setTimeout(() => setCopyLinkFeedback(false), 2000);
-    });
   };
 
   return (
@@ -82,11 +41,11 @@ export default function CollectionPanel({
       </h2>
 
       <p className="mb-3 text-xs" style={{ color: "var(--text-muted)" }}>
-        Create a collection, then click it to open link and sharing tools.
+        Create a collection, then click it to manage links and view details.
       </p>
 
       <form onSubmit={handleSubmit} className="mb-4 space-y-2">
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="flex flex-col gap-2">
           <input
             value={collectionName}
             onChange={(event) => setCollectionName(event.target.value)}
@@ -100,7 +59,7 @@ export default function CollectionPanel({
           />
           <button
             type="submit"
-            className="rounded-lg px-3 py-2 text-sm font-medium transition hover:-translate-y-0.5"
+            className="w-full rounded-lg px-3 py-2 text-sm font-medium transition hover:-translate-y-0.5"
             style={{
               backgroundColor: "var(--text)",
               color: "var(--bg)",
@@ -192,7 +151,7 @@ export default function CollectionPanel({
             return (
               <li key={collection.id}>
                 <div
-                  className="flex items-center gap-2 rounded-lg border px-2 py-2"
+                  className="flex items-start gap-2 rounded-lg border px-2 py-2"
                   style={{
                     borderColor: "var(--border)",
                     backgroundColor: isActive
@@ -251,7 +210,7 @@ export default function CollectionPanel({
                         {collection.is_public ? " (Public)" : " (Private)"}
                       </button>
 
-                      <div className="flex items-center gap-1">
+                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
                         {isConfirmingDelete ? (
                           <>
                             <button
@@ -313,179 +272,6 @@ export default function CollectionPanel({
         </ul>
       )}
 
-      {selectedCollection ? (
-        <section
-          className="mt-4 space-y-3 rounded-xl border p-3"
-          style={{
-            borderColor: "var(--border)",
-            backgroundColor: "var(--surface-soft)",
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <p
-              className="text-xs font-semibold uppercase"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Access Settings
-            </p>
-            <button
-              onClick={() =>
-                onToggleVisibility(
-                  selectedCollection.id,
-                  !selectedCollection.is_public,
-                )
-              }
-              className="rounded px-2 py-1 text-xs"
-              style={{
-                border: `1px solid var(--border)`,
-                backgroundColor: "transparent",
-                color: "var(--text)",
-              }}
-            >
-              Make {selectedCollection.is_public ? "Private" : "Public"}
-            </button>
-          </div>
-
-          {selectedCollection.is_public && (
-            <div className="space-y-2">
-              <p
-                className="text-xs font-semibold uppercase"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Public Share Link
-              </p>
-              {generatedLinkState.collectionId === selectedCollection.id ? (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={generatedLinkState.url}
-                    className="min-w-0 flex-1 rounded border px-2 py-1 text-xs outline-none"
-                    style={{
-                      borderColor: "var(--border)",
-                      backgroundColor: "var(--surface)",
-                      color: "var(--text)",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleCopyShareLink}
-                    className="rounded px-3 py-1 text-xs transition"
-                    style={{
-                      border: `1px solid var(--border)`,
-                      backgroundColor: copyLinkFeedback
-                        ? "var(--text)"
-                        : "transparent",
-                      color: copyLinkFeedback ? "var(--bg)" : "var(--text)",
-                    }}
-                  >
-                    {copyLinkFeedback ? "Copied!" : "Copy"}
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleGenerateShareLink}
-                  className="rounded border px-3 py-1 text-xs"
-                  style={{
-                    borderColor: "var(--border)",
-                    backgroundColor: "transparent",
-                    color: "var(--text)",
-                  }}
-                >
-                  Generate Link
-                </button>
-              )}
-            </div>
-          )}
-
-          <form onSubmit={handleShare} className="space-y-2">
-            <p
-              className="text-xs font-semibold uppercase"
-              style={{ color: "var(--text-muted)" }}
-            >
-              Share with team member
-            </p>
-            <input
-              value={shareEmail}
-              onChange={(event) => setShareEmail(event.target.value)}
-              placeholder="Member email"
-              className="w-full rounded border px-2 py-1 text-sm outline-none"
-              style={{
-                borderColor: "var(--border)",
-                backgroundColor: "var(--surface)",
-                color: "var(--text)",
-              }}
-            />
-            <div className="flex gap-2">
-              <select
-                value={shareRole}
-                onChange={(event) => setShareRole(event.target.value)}
-                className="flex-1 rounded border px-2 py-1 text-sm outline-none"
-                style={{
-                  borderColor: "var(--border)",
-                  backgroundColor: "var(--surface)",
-                  color: "var(--text)",
-                }}
-              >
-                <option value="viewer">Viewer</option>
-                <option value="editor">Editor</option>
-                <option value="admin">Admin</option>
-              </select>
-              <button
-                type="submit"
-                className="rounded px-3 py-1 text-xs"
-                style={{
-                  border: `1px solid var(--border)`,
-                  backgroundColor: "transparent",
-                  color: "var(--text)",
-                }}
-              >
-                Share
-              </button>
-            </div>
-          </form>
-
-          {isMembersLoading ? (
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              Loading members...
-            </p>
-          ) : members.length ? (
-            <ul className="space-y-1">
-              {members.map((member) => (
-                <li
-                  key={member.user_id}
-                  className="flex items-center justify-between gap-2"
-                >
-                  <span
-                    className="truncate text-xs"
-                    style={{ color: "var(--text)" }}
-                  >
-                    {member.user_id} ({member.role})
-                  </span>
-                  <button
-                    onClick={() =>
-                      onRemoveMember(selectedCollection.id, member.user_id)
-                    }
-                    className="rounded px-2 py-1 text-xs"
-                    style={{
-                      border: `1px solid var(--border)`,
-                      backgroundColor: "transparent",
-                      color: "var(--text)",
-                    }}
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-              No shared members yet.
-            </p>
-          )}
-        </section>
-      ) : null}
     </aside>
   );
 }
