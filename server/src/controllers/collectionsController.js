@@ -4,6 +4,7 @@ import {
   getCollectionMembers,
   getCollectionsForUser,
   removeCollectionMember,
+  resolveUserIdByEmail,
   shareCollection,
   updateCollection,
 } from "../services/collectionService.js";
@@ -94,21 +95,42 @@ export const shareCollectionHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.auth().userId;
-    const { memberUserId, role = "viewer" } = req.body;
+    const { memberUserId, memberEmail, role = "viewer" } = req.body;
 
-    if (!memberUserId?.trim()) {
-      return res.status(400).json({ error: "memberUserId is required" });
+    const normalizedEmail = String(memberEmail || "")
+      .trim()
+      .toLowerCase();
+    const normalizedMemberUserId = String(memberUserId || "").trim();
+
+    if (!normalizedEmail && !normalizedMemberUserId) {
+      return res
+        .status(400)
+        .json({ error: "memberEmail or memberUserId is required" });
     }
 
     if (!["viewer", "editor", "admin"].includes(role)) {
       return res.status(400).json({ error: "invalid role" });
     }
 
-    if (memberUserId === userId) {
+    let resolvedMemberUserId = normalizedMemberUserId;
+
+    if (normalizedEmail) {
+      resolvedMemberUserId = await resolveUserIdByEmail(normalizedEmail);
+      if (!resolvedMemberUserId) {
+        return res.status(404).json({ error: "No user found for this email" });
+      }
+    }
+
+    if (resolvedMemberUserId === userId) {
       return res.status(400).json({ error: "owner already has access" });
     }
 
-    const result = await shareCollection(userId, id, memberUserId, role);
+    const result = await shareCollection(
+      userId,
+      id,
+      resolvedMemberUserId,
+      role,
+    );
     if (!result) {
       return res.status(403).json({ error: "only owner can share" });
     }

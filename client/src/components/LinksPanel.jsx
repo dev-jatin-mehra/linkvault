@@ -1,10 +1,16 @@
 import { useMemo, useState } from "react";
 
-function parseTags(input) {
-  if (!input.trim()) return [];
-  return [
-    ...new Set(input.split(",").map((tag) => tag.trim().toLowerCase())),
-  ].filter(Boolean);
+function normalizeTag(tag) {
+  return String(tag || "")
+    .trim()
+    .toLowerCase();
+}
+
+function addTag(currentTags, rawTag) {
+  const normalized = normalizeTag(rawTag);
+  if (!normalized) return currentTags;
+  if (currentTags.includes(normalized)) return currentTags;
+  return [...currentTags, normalized];
 }
 
 function normalizeUrl(url) {
@@ -31,12 +37,14 @@ export default function LinksPanel({
 }) {
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [tagList, setTagList] = useState([]);
 
   const [editingLinkId, setEditingLinkId] = useState(null);
   const [editingUrl, setEditingUrl] = useState("");
   const [editingTitle, setEditingTitle] = useState("");
-  const [editingTags, setEditingTags] = useState("");
+  const [editingTagInput, setEditingTagInput] = useState("");
+  const [editingTagList, setEditingTagList] = useState([]);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const isSearchMode = searchQuery.trim().length > 0;
@@ -53,12 +61,23 @@ export default function LinksPanel({
     await onAddLink({
       url: trimmedUrl,
       title: title.trim(),
-      tags: parseTags(tags),
+      tags: tagList,
     });
 
     setUrl("");
     setTitle("");
-    setTags("");
+    setTagInput("");
+    setTagList([]);
+  };
+
+  const commitCreateTag = () => {
+    setTagList((prev) => addTag(prev, tagInput));
+    setTagInput("");
+  };
+
+  const commitEditTag = () => {
+    setEditingTagList((prev) => addTag(prev, editingTagInput));
+    setEditingTagInput("");
   };
 
   if (!selectedCollection && !isSearchMode) {
@@ -118,7 +137,7 @@ export default function LinksPanel({
       {!isSearchMode && selectedCollection ? (
         <form
           onSubmit={handleSubmit}
-          className="mb-6 grid gap-2 md:grid-cols-[1.5fr_1fr_1fr_auto]"
+          className="mb-6 grid gap-2 md:grid-cols-[1.4fr_1fr_1.3fr_auto]"
         >
           <input
             value={url}
@@ -142,17 +161,51 @@ export default function LinksPanel({
               color: "var(--text)",
             }}
           />
-          <input
-            value={tags}
-            onChange={(event) => setTags(event.target.value)}
-            placeholder="tags: design,react"
-            className="rounded-lg border px-3 py-2 text-sm outline-none"
+          <div
+            className="rounded-lg border px-2 py-1"
             style={{
               borderColor: "var(--border)",
               backgroundColor: "var(--surface)",
-              color: "var(--text)",
             }}
-          />
+          >
+            <div className="mb-1 flex flex-wrap gap-1">
+              {tagList.map((tag) => (
+                <button
+                  key={`create-${tag}`}
+                  type="button"
+                  onClick={() =>
+                    setTagList((prev) => prev.filter((item) => item !== tag))
+                  }
+                  className="rounded-full border px-2 py-0.5 text-xs"
+                  style={{
+                    borderColor: "var(--border)",
+                    color: "var(--text-muted)",
+                    backgroundColor: "var(--surface-soft)",
+                  }}
+                  title="Remove tag"
+                >
+                  #{tag} ×
+                </button>
+              ))}
+            </div>
+            <input
+              value={tagInput}
+              onChange={(event) => setTagInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (["Enter", "Tab", ","].includes(event.key)) {
+                  event.preventDefault();
+                  commitCreateTag();
+                }
+              }}
+              onBlur={commitCreateTag}
+              placeholder="Add tags (press Enter)"
+              className="w-full border-0 px-1 py-1 text-sm outline-none"
+              style={{
+                backgroundColor: "transparent",
+                color: "var(--text)",
+              }}
+            />
+          </div>
           <button
             type="submit"
             className="rounded-lg px-4 py-2 text-sm font-medium transition hover:-translate-y-0.5"
@@ -186,7 +239,12 @@ export default function LinksPanel({
               setEditingLinkId(link.id);
               setEditingUrl(link.url || "");
               setEditingTitle(link.title || "");
-              setEditingTags((link.tags || []).join(", "));
+              setEditingTagList(
+                Array.isArray(link.tags)
+                  ? link.tags.map((tag) => normalizeTag(tag)).filter(Boolean)
+                  : [],
+              );
+              setEditingTagInput("");
               setConfirmDeleteId(null);
             };
 
@@ -194,7 +252,8 @@ export default function LinksPanel({
               setEditingLinkId(null);
               setEditingUrl("");
               setEditingTitle("");
-              setEditingTags("");
+              setEditingTagList([]);
+              setEditingTagInput("");
             };
 
             const saveEdit = async (event) => {
@@ -205,13 +264,14 @@ export default function LinksPanel({
               await onEditLink(link.id, {
                 url: trimmedUrl,
                 title: editingTitle.trim(),
-                tags: parseTags(editingTags),
+                tags: editingTagList,
               });
 
               setEditingLinkId(null);
               setEditingUrl("");
               setEditingTitle("");
-              setEditingTags("");
+              setEditingTagList([]);
+              setEditingTagInput("");
             };
 
             const requestDelete = () => {
@@ -269,17 +329,54 @@ export default function LinksPanel({
                         color: "var(--text)",
                       }}
                     />
-                    <input
-                      value={editingTags}
-                      onChange={(event) => setEditingTags(event.target.value)}
-                      placeholder="tags: design,react"
-                      className="w-full rounded border px-2 py-1 text-sm outline-none"
+                    <div
+                      className="rounded border px-2 py-1"
                       style={{
                         borderColor: "var(--border)",
                         backgroundColor: "var(--surface)",
-                        color: "var(--text)",
                       }}
-                    />
+                    >
+                      <div className="mb-1 flex flex-wrap gap-1">
+                        {editingTagList.map((tag) => (
+                          <button
+                            key={`edit-${link.id}-${tag}`}
+                            type="button"
+                            onClick={() =>
+                              setEditingTagList((prev) =>
+                                prev.filter((item) => item !== tag),
+                              )
+                            }
+                            className="rounded-full border px-2 py-0.5 text-xs"
+                            style={{
+                              borderColor: "var(--border)",
+                              color: "var(--text-muted)",
+                              backgroundColor: "var(--surface-soft)",
+                            }}
+                          >
+                            #{tag} ×
+                          </button>
+                        ))}
+                      </div>
+                      <input
+                        value={editingTagInput}
+                        onChange={(event) =>
+                          setEditingTagInput(event.target.value)
+                        }
+                        onKeyDown={(event) => {
+                          if (["Enter", "Tab", ","].includes(event.key)) {
+                            event.preventDefault();
+                            commitEditTag();
+                          }
+                        }}
+                        onBlur={commitEditTag}
+                        placeholder="Add tags (press Enter)"
+                        className="w-full border-0 px-1 py-1 text-sm outline-none"
+                        style={{
+                          backgroundColor: "transparent",
+                          color: "var(--text)",
+                        }}
+                      />
+                    </div>
                     <div className="flex items-center justify-end gap-1">
                       <button
                         type="submit"

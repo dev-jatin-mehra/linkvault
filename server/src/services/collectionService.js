@@ -1,6 +1,52 @@
 import { randomUUID } from "crypto";
 import { pool } from "../config/db.js";
 
+const getSupabaseAdminConfig = () => {
+  const supabaseUrl = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error(
+      "Server is missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY",
+    );
+  }
+
+  return { supabaseUrl, serviceRoleKey };
+};
+
+export const resolveUserIdByEmail = async (email) => {
+  const normalizedEmail = String(email || "")
+    .trim()
+    .toLowerCase();
+  if (!normalizedEmail) return null;
+
+  const { supabaseUrl, serviceRoleKey } = getSupabaseAdminConfig();
+
+  const response = await fetch(
+    `${supabaseUrl}/auth/v1/admin/users?email=${encodeURIComponent(normalizedEmail)}`,
+    {
+      method: "GET",
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.msg || body?.error || "User lookup failed");
+  }
+
+  const body = await response.json().catch(() => ({}));
+  const users = Array.isArray(body?.users) ? body.users : [];
+  const matched = users.find(
+    (user) => String(user?.email || "").toLowerCase() === normalizedEmail,
+  );
+
+  return matched?.id || null;
+};
+
 export const createCollection = async (userId, name, isPublic = false) => {
   const id = randomUUID();
 
@@ -19,7 +65,7 @@ export const getCollectionsForUser = async (userId) => {
             CASE
               WHEN c.user_id = $1 THEN 'owner'
               WHEN cm.user_id IS NOT NULL THEN 'shared'
-              ELSE 'public'
+              ELSE 'private'
             END AS access_level,
             (
               SELECT COUNT(*)::INT
@@ -31,7 +77,6 @@ export const getCollectionsForUser = async (userId) => {
        ON cm.collection_id = c.id AND cm.user_id = $1
      WHERE c.user_id = $1
         OR cm.user_id IS NOT NULL
-        OR c.is_public = TRUE
      ORDER BY c.created_at DESC`,
     [userId],
   );

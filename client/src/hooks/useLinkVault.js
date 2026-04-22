@@ -77,9 +77,7 @@ export default function useLinkVault() {
           const shouldKeepSelected = nextCollections.some(
             (item) => item.id === previousSelectedId,
           );
-          return shouldKeepSelected
-            ? previousSelectedId
-            : nextCollections[0].id;
+          return shouldKeepSelected ? previousSelectedId : null;
         });
       } catch (requestError) {
         setError(requestError.message || "Failed to load collections.");
@@ -261,14 +259,16 @@ export default function useLinkVault() {
       const created = await createCollection(name.trim(), token, isPublic);
 
       setCollections((prev) => [created, ...prev]);
-      if (!selectedId) setSelectedId(created.id);
     } catch (requestError) {
       setError(requestError.message || "Failed to create collection.");
       throw requestError;
     }
   };
 
-  const selectCollection = (id) => setSelectedId(id);
+  const selectCollection = (id) =>
+    setSelectedId((previousSelectedId) =>
+      previousSelectedId === id ? null : id,
+    );
 
   const editCollection = async (id, payload) => {
     const isPayloadString = typeof payload === "string";
@@ -315,12 +315,9 @@ export default function useLinkVault() {
         const nextCollections = prev.filter((item) => item.id !== id);
 
         if (selectedId === id) {
-          const nextSelectedId = nextCollections[0]?.id || null;
-          setSelectedId(nextSelectedId);
-          if (!nextSelectedId) {
-            setLinks([]);
-            setMembers([]);
-          }
+          setSelectedId(null);
+          setLinks([]);
+          setMembers([]);
         }
 
         return nextCollections;
@@ -343,20 +340,20 @@ export default function useLinkVault() {
 
   const shareWithMember = async (
     collectionId,
-    memberUserId,
+    memberIdentifier,
     role = "viewer",
   ) => {
-    if (!collectionId || !memberUserId?.trim() || !isSignedIn) return;
+    const normalizedIdentifier = String(memberIdentifier || "").trim();
+    if (!collectionId || !normalizedIdentifier || !isSignedIn) return;
 
     setError("");
 
     try {
       const token = await getToken();
-      const member = await shareCollection(
-        collectionId,
-        { memberUserId: memberUserId.trim(), role },
-        token,
-      );
+      const payload = normalizedIdentifier.includes("@")
+        ? { memberEmail: normalizedIdentifier.toLowerCase(), role }
+        : { memberUserId: normalizedIdentifier, role };
+      const member = await shareCollection(collectionId, payload, token);
 
       setMembers((prev) => {
         const withoutCurrent = prev.filter(

@@ -4,7 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithGoogle, requestPasswordReset } = useAuth();
 
   const [mode, setMode] = useState("signin");
   const [fullName, setFullName] = useState("");
@@ -35,6 +35,27 @@ export default function AuthPage() {
       await signInWithGoogle();
     } catch (authError) {
       setError(authError.message || "Google sign-in failed.");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError("");
+    setMessage("");
+
+    const normalizedEmail = normalizeEmail(email);
+    if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
+      setError("Enter a valid email to receive a reset link.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await requestPasswordReset(normalizedEmail);
+      setMessage("Password reset link sent. Check your inbox.");
+    } catch (authError) {
+      setError(authError.message || "Could not send password reset link.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -284,6 +305,17 @@ export default function AuthPage() {
                 color: "var(--text)",
               }}
             />
+            {mode === "signin" ? (
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={isSubmitting}
+                className="mt-2 text-xs underline underline-offset-2"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Forgot password?
+              </button>
+            ) : null}
           </label>
 
           {mode === "signup" ? (

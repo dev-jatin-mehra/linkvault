@@ -153,21 +153,46 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="dash-animate">
-            <LinksPanel
-              selectedCollection={selectedCollection}
-              links={links}
-              searchQuery={searchQuery}
-              searchResults={searchResults}
-              onAddLink={addLink}
-              onEditLink={editLink}
-              onDeleteLink={removeLink}
-              onTrackClick={trackClick}
-              onSearchChange={setSearchQuery}
-              isLoading={isLinksLoading}
-              isSearching={isSearching}
-            />
-          </div>
+          {selectedCollection ? (
+            <div className="dash-animate">
+              <LinksPanel
+                selectedCollection={selectedCollection}
+                links={links}
+                searchQuery={searchQuery}
+                searchResults={searchResults}
+                onAddLink={addLink}
+                onEditLink={editLink}
+                onDeleteLink={removeLink}
+                onTrackClick={trackClick}
+                onSearchChange={setSearchQuery}
+                isLoading={isLinksLoading}
+                isSearching={isSearching}
+              />
+            </div>
+          ) : (
+            <div
+              className="dash-animate rounded-2xl border border-dashed p-5"
+              style={{
+                borderColor: "var(--border)",
+                backgroundColor: "var(--surface)",
+              }}
+            >
+              <h3
+                className="text-sm font-semibold"
+                style={{ color: "var(--text)" }}
+              >
+                Start here
+              </h3>
+              <p
+                className="mt-1 text-sm"
+                style={{ color: "var(--text-muted)" }}
+              >
+                {collections.length
+                  ? "Click a collection to view links, sharing, and analytics details. Click it again to collapse."
+                  : "Create your first collection on the left. Link and sharing tools will appear after that."}
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>

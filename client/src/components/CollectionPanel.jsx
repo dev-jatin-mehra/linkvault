@@ -21,9 +21,13 @@ export default function CollectionPanel({
   const [editingName, setEditingName] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
-  const [shareUserId, setShareUserId] = useState("");
+  const [shareEmail, setShareEmail] = useState("");
   const [shareRole, setShareRole] = useState("viewer");
   const [copyLinkFeedback, setCopyLinkFeedback] = useState(false);
+  const [generatedLinkState, setGeneratedLinkState] = useState({
+    collectionId: null,
+    url: "",
+  });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -37,18 +41,26 @@ export default function CollectionPanel({
 
   const handleShare = async (event) => {
     event.preventDefault();
-    if (!selectedCollection || !shareUserId.trim()) return;
+    if (!selectedCollection || !shareEmail.trim()) return;
 
-    await onShareMember(selectedCollection.id, shareUserId.trim(), shareRole);
-    setShareUserId("");
+    await onShareMember(selectedCollection.id, shareEmail.trim(), shareRole);
+    setShareEmail("");
     setShareRole("viewer");
   };
 
-  const handleCopyShareLink = () => {
+  const handleGenerateShareLink = () => {
     if (!selectedCollection) return;
+    setGeneratedLinkState({
+      collectionId: selectedCollection.id,
+      url: `${window.location.origin}/collection/${selectedCollection.id}`,
+    });
+    setCopyLinkFeedback(false);
+  };
 
-    const shareUrl = `${window.location.origin}/collection/${selectedCollection.id}`;
-    navigator.clipboard.writeText(shareUrl).then(() => {
+  const handleCopyShareLink = () => {
+    if (!generatedLinkState.url) return;
+
+    navigator.clipboard.writeText(generatedLinkState.url).then(() => {
       setCopyLinkFeedback(true);
       setTimeout(() => setCopyLinkFeedback(false), 2000);
     });
@@ -68,6 +80,10 @@ export default function CollectionPanel({
       >
         Collections
       </h2>
+
+      <p className="mb-3 text-xs" style={{ color: "var(--text-muted)" }}>
+        Create a collection, then click it to open link and sharing tools.
+      </p>
 
       <form onSubmit={handleSubmit} className="mb-4 space-y-2">
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -112,9 +128,16 @@ export default function CollectionPanel({
           Loading collections...
         </p>
       ) : collections.length === 0 ? (
-        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          No collections yet.
-        </p>
+        <div
+          className="rounded-lg border border-dashed p-3 text-sm"
+          style={{
+            borderColor: "var(--border)",
+            color: "var(--text-muted)",
+            backgroundColor: "var(--surface-soft)",
+          }}
+        >
+          No collections yet. Start by creating one above.
+        </div>
       ) : (
         <ul className="space-y-2">
           {collections.map((collection) => {
@@ -222,6 +245,7 @@ export default function CollectionPanel({
                       <button
                         onClick={() => onSelect(collection.id)}
                         className="min-w-0 flex-1 truncate text-left text-sm"
+                        title="Click to expand. Click again to collapse."
                       >
                         {collection.name}
                         {collection.is_public ? " (Public)" : " (Private)"}
@@ -330,32 +354,48 @@ export default function CollectionPanel({
               >
                 Public Share Link
               </p>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  readOnly
-                  value={`${window.location.origin}/collection/${selectedCollection.id}`}
-                  className="min-w-0 flex-1 rounded border px-2 py-1 text-xs outline-none"
+              {generatedLinkState.collectionId === selectedCollection.id ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={generatedLinkState.url}
+                    className="min-w-0 flex-1 rounded border px-2 py-1 text-xs outline-none"
+                    style={{
+                      borderColor: "var(--border)",
+                      backgroundColor: "var(--surface)",
+                      color: "var(--text)",
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyShareLink}
+                    className="rounded px-3 py-1 text-xs transition"
+                    style={{
+                      border: `1px solid var(--border)`,
+                      backgroundColor: copyLinkFeedback
+                        ? "var(--text)"
+                        : "transparent",
+                      color: copyLinkFeedback ? "var(--bg)" : "var(--text)",
+                    }}
+                  >
+                    {copyLinkFeedback ? "Copied!" : "Copy"}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleGenerateShareLink}
+                  className="rounded border px-3 py-1 text-xs"
                   style={{
                     borderColor: "var(--border)",
-                    backgroundColor: "var(--surface)",
+                    backgroundColor: "transparent",
                     color: "var(--text)",
                   }}
-                />
-                <button
-                  onClick={handleCopyShareLink}
-                  className="rounded px-3 py-1 text-xs transition"
-                  style={{
-                    border: `1px solid var(--border)`,
-                    backgroundColor: copyLinkFeedback
-                      ? "var(--text)"
-                      : "transparent",
-                    color: copyLinkFeedback ? "var(--bg)" : "var(--text)",
-                  }}
                 >
-                  {copyLinkFeedback ? "Copied!" : "Copy"}
+                  Generate Link
                 </button>
-              </div>
+              )}
             </div>
           )}
 
@@ -367,9 +407,9 @@ export default function CollectionPanel({
               Share with team member
             </p>
             <input
-              value={shareUserId}
-              onChange={(event) => setShareUserId(event.target.value)}
-              placeholder="Member user id"
+              value={shareEmail}
+              onChange={(event) => setShareEmail(event.target.value)}
+              placeholder="Member email"
               className="w-full rounded border px-2 py-1 text-sm outline-none"
               style={{
                 borderColor: "var(--border)",

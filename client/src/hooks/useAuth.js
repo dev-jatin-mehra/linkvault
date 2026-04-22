@@ -154,21 +154,27 @@ export function AuthProvider({ children }) {
     }
   }, [getToken]);
 
-  const requestPasswordReset = useCallback(async () => {
-    const appUrl = getAppUrl();
-    const { data } = await supabase.auth.getSession();
-    const email = data.session?.user?.email || user?.email;
+  const requestPasswordReset = useCallback(
+    async (emailInput = "") => {
+      const appUrl = getAppUrl();
+      const { data } = await supabase.auth.getSession();
+      const inputEmail = String(emailInput || "")
+        .trim()
+        .toLowerCase();
+      const email = inputEmail || data.session?.user?.email || user?.email;
 
-    if (!email) {
-      throw new Error("No email found for the current account.");
-    }
+      if (!email) {
+        throw new Error("No email found for the current account.");
+      }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${appUrl}/login`,
-    });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${appUrl}/login`,
+      });
 
-    if (error) throw error;
-  }, [user]);
+      if (error) throw error;
+    },
+    [user],
+  );
 
   const value = useMemo(
     () => ({
